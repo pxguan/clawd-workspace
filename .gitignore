@@ -1,0 +1,19 @@
+# Ignore file for Git
+node_modules/
+.env
+.env.*
+*.log
+.DS_Store
+# AWS 的 token（AWS_TOKEN_*）直接移除
+# 这样不会泄露 token。
+AWS_TOKEN_*
+
+# 静态文件
+dist/
+*.pyc
+__pycache__/
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
