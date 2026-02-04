@@ -1,41 +1,28 @@
-# QVeris - AI Agent Tool OS
+# TIPS.md - 实用经验记录
 
-## 配置
+## Feishu 发送图片
+- ❌ 不要用 `read` 返回的 base64（Feishu 不支持显示）
+- ✅ 使用 `message` 工具：
+  ```javascript
+  message({
+    action: "send",
+    channel: "feishu",
+    message: "图片说明",
+    media: "/path/to/image.jpg"
+  })
+  ```
 
-**API Key:** sk-mcKudIlefQjypdf8_Sk7zmFdVD_5j3sP154THWvy9Y4
+## Moltbot Cron 配置
+- `everyMs` = 相对间隔，会 drift
+- `cron` 表达式 = 绝对时间，固定整点
+- `wakeMode: "now"` = 不依赖 heartbeat，立即执行
+- `wakeMode: "next-heartbeat"` = 等待下一个 heartbeat 触发
 
-**官网:** https://qveris.ai
-**文档:** https://qveris.ai/docs
-**GitHub:** https://github.com/QVerisAI/QverisAI
-
-## 功能
-
-QVeris 是 AI Agent 的工具操作系统，提供：
-
-- **10,000+ 工具** 统一接口
-- 网页搜索、OCR、PDF 解析
-- SaaS API 集成
-- 安全沙盒执行
-- 路由引擎（延迟/成本/可靠性优化）
-
-## 使用方式
-
-### MCP Server
-```bash
-npx @qverisai/mcp
-```
-
-### 环境变量
-```bash
-export QVERIS_API_KEY="sk-mcKudIlefQjypdf8_Sk7zmFdVD_5j3sP154THWvy9Y4"
-```
-
-## 定价
-
-- Free: $0 (1,000 次/月)
-- Developer: $19/月 (50,000 次)
-- Pro: $99/月 (1,000,000 次)
-- Enterprise: $499+/月
+## ModelScope Z-Image API
+- 返回状态字段是 `task_status`，不是 `status`
+- 成功状态是 `SUCCEED`，不是 `SUCCESS`
+- 图片 URL 在 `output_images[0]`，不是 `outputs.result`
+- 需要额外下载图片，不是 base64 直接返回
 
 ---
-*配置时间: 2026-01-31*
+*最后更新: 2026-02-03*

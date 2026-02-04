@@ -86,4 +86,30 @@
 
 ---
 
-*最后更新: 2026-02-01 04:58 UTC*
+*最后更新: 2026-02-04 09:36 UTC*
+
+---
+
+## 🤖 定时任务配置
+
+### 已配置的 Cron 任务
+1. **心跳检查** - 每30分钟 (HEARTBEAT_OK)
+2. **Twitter 热点汇总** - 每4小时 (0 */4 * * * UTC)
+3. **每日天气报告** - 每天 UTC 0:00 (北京时间 8:00) ✅ 已测试
+4. **博客更新监控** - 每2小时 (0 */2 * * * UTC) - 需安装 blogwatcher
+5. **GitHub 仓库监控** - 每小时 (0 * * * * UTC) - 需安装 gh CLI
+6. **Trello 任务提醒** - 每天 UTC 1:00 (北京时间 9:00) - 需配置 TRELLO_API_KEY
+7. **春节回揭阳出发提醒** - 2026-02-12 06:00
+8. **A股监控** - 交易时间每15分钟
+
+### 脚本位置
+- `/home/node/clawd/scripts/weather-report.sh` ✅ 使用 Open-Meteo API
+- `/home/node/clawd/scripts/blog-watcher.sh`
+- `/home/node/clawd/scripts/github-monitor.sh`
+- `/home/node/clawd/scripts/trello-reminder.sh`
+- `/home/node/.openclaw/workspace/scripts/fetch-tweets-smart.sh`
+- `/home/node/.openclaw/workspace/scripts/a-stock-monitor.sh`
+
+### 待安装依赖
+- `go install github.com/Hyaxia/blogwatcher/cmd/blogwatcher@latest`
+- `apt install gh` (GitHub CLI)
