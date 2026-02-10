@@ -84,6 +84,14 @@
    - 每次请求都携带完整上下文
    - 及时清理不需要的历史消息
 
+### 诚实汇报问题
+1. **遇到问题先告诉用户，不要闷头修**
+   - 测试失败要说明原因
+   - 不要假装没问题
+2. **错误处理要透明**
+   - API 调用失败要报告
+   - 翻译/解析异常要说明
+
 ---
 
 *最后更新: 2026-02-04 09:36 UTC*
@@ -107,8 +115,13 @@
 - `/home/node/clawd/scripts/blog-watcher.sh`
 - `/home/node/clawd/scripts/github-monitor.sh`
 - `/home/node/clawd/scripts/trello-reminder.sh`
+- `/home/node/clawd/scripts/github-trending.sh` ✅ 含中文翻译
 - `/home/node/.openclaw/workspace/scripts/fetch-tweets-smart.sh`
 - `/home/node/.openclaw/workspace/scripts/a-stock-monitor.sh`
+
+### ⚡ 开发规范
+- **每次修改脚本后必须测试**，确认没问题再交付
+- GitHub Trending 输出格式：仓库名链接 + 星数 + 语言标签 + README 预览 + 中文描述
 
 ### 待安装依赖
 - `go install github.com/Hyaxia/blogwatcher/cmd/blogwatcher@latest`
