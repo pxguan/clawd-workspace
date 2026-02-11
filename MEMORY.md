@@ -44,8 +44,10 @@
 - **配置文件:** `/home/node/clawd/.env.qveris`
 
 ### Twitter
-- **AUTH_TOKEN:** `b5a2d38cc4cb703d373ff230ad19a16487cb099e`
+- **AUTH_TOKEN:** `AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA` (2026-02-11 从 TweetDetail 获取)
 - **CT0:** `620a150990b7ceb46977dfead8bd74fa8c7f5cd102c157c3993cfbc7c750c27b435821384645e91ef6e4fd6de0ad1a2072c07743a96cdced1f0af09afbe11dacec898124358280eb5ab6fa1b4fa6dab0`
+- **限制:** Twitter API v2 免费层每月 500 次请求（~16次/天）
+- **备用 AUTH_TOKEN:** `4e71596a96cf770ad852eda68916b03f7ea76607` (2026-02-10), `b5a2d38cc4cb703d373ff230ad19a16487cb099e`（旧）
 - **状态:** 已解锁（需低并发请求）
 
 ---
@@ -69,11 +71,17 @@
 - **双渠道运行：** Feishu + Telegram 同时在线
 - **Lobstalk 技能：** 添加 AI agent 群聊功能（龙虾群）
 
+### 2026-02-11
+- **Twitter Token 失效问题：** AUTH_TOKEN 和 CT0 过期导致 API 401
+- **修复方案：** 析言提供新 token，脚本更新为 `twitter-trending-simple.sh`
+- **bird CLI 问题：** `npx @steipete/bird` 命令会超时卡住，不再使用
+
 ---
 
-## ⚠️ 操作教训（重要）
-
-### Token 消耗控制
+### Twitter 脚本路径
+- **主脚本：** `/home/node/.openclaw/workspace/scripts/twitter-trending-simple.sh`
+- **旧脚本（已弃用）：** `/home/node/.openclaw/workspace/scripts/fetch-tweets-smart.sh`
+- **原因：** bird CLI 会超时卡住
 1. **可能卡住的命令必须加 timeout**
    - 使用 `exec` 的 `timeout` 参数
    - 示例：`timeout: 60`（60秒超时）
