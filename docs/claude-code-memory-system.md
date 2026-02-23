@@ -280,4 +280,92 @@ export PATH="$PATH:~/.claude/skills/memory-core"
 
 ---
 
+## 💻 现有代码实现
+
+### 记忆系统核心脚本
+
+| 文件 | 功能 | 路径 |
+|------|------|------|
+| **每日冥想** | 回顾今日活动，记录到 evolution-log.md | `scripts/daily-meditation.sh` |
+| **自动检查** | 检查空脚本和 TODO 项，报告到 Discord | `scripts/auto-inspect.sh` |
+| **自动备份** | Git 自动提交和推送 | `scripts/auto-git-backup.sh` |
+
+### 数据采集脚本
+
+| 文件 | 功能 | 路径 |
+|------|------|------|
+| **Twitter 汇总** | 搜索 AI 相关推文，翻译并发送 | `scripts/twitter-trending-simple.sh` |
+| **发送助手** | 格式化汇总输出 | `scripts/send-twitter-summary.sh` |
+| **A股监控** | 每15分钟获取涨跌数据，推荐股票 | `scripts/a-stock-monitor.sh` |
+| **A股看门狗** | 监控异常波动 | `scripts/a-stock-watchdog.sh` |
+| **A股状态** | 查看当前监控状态 | `scripts/a-stock-status.sh` |
+
+### 其他工具
+
+| 文件 | 功能 | 路径 |
+|------|------|------|
+| **新闻视频制作** | 自动生成新闻视频 | `scripts/news-video-maker.sh` |
+| **股票监控（Python）** | Python 版本监控 | `scripts/python/stock_monitor.py` |
+| **获取推文** | 获取指定用户推文 | `scripts/fetch-tweets.sh` |
+| **智能获取推文** | 带缓存的推文获取 | `scripts/fetch-tweets-smart.sh` |
+| **监控 A 股列表** | 批量监控 | `scripts/monitor-a-stocks.sh` |
+
+### 记忆文件结构
+
+```
+memory/
+├── heartbeat-state.json       # Heartbeat 状态跟踪
+├── twitter-summary/           # Twitter 汇总触发文件
+├── weather/                   # 天气报告触发文件
+├── blog-watcher/              # 博客监控触发文件
+├── github/                    # GitHub 监控触发文件
+├── trello/                    # Trello 提醒触发文件
+├── notion/                    # Notion 监控触发文件
+├── papers/                    # 论文监控触发文件
+├── github-trending/           # GitHub Trending 触发文件
+├── system/                    # 系统监控触发文件
+├── podcasts/                  # 播客监控触发文件
+├── crypto/                    # 加密货币监控触发文件
+├── git-backup/                # Git 备份日志
+├── disk-alert/                # 磁盘告警触发文件
+└── a-stocks/                  # A股监控日志和状态
+    ├── monitor.log
+    └── latest_recommendations.json
+```
+
+### 状态文件
+
+| 文件 | 用途 |
+|------|------|
+| `evolution-log.md` | 成长轨迹记录 |
+| `.openclaw/workspace-state.json` | 工作区状态 |
+| `memory/heartbeat-state.json` | Heartbeat 时间戳 |
+
+---
+
+## 🔗 脚本依赖关系
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Heartbeat (每30分钟)               │
+└────────────────┬────────────────────────────────────┘
+                 │
+        ┌────────▼────────────────────────────┐
+        │                                       │
+        ▼                                       ▼
+┌───────────────┐                    ┌────────────────┐
+│ 检查触发文件   │                    │ daily-meditation│
+│ 发送汇总      │                    │ (每日凌晨)      │
+└───────────────┘                    └────────────────┘
+        │                                       │
+        ▼                                       ▼
+┌───────────────┐                    ┌────────────────┐
+│ Twitter 汇总  │◄────────────────────│ 记录今日活动    │
+│ A股监控       │    Cron 定时        │ Git 提交统计    │
+│ 天气报告      │                    │ 系统状态检查    │
+└───────────────┘                    └────────────────┘
+```
+
+---
+
 *本文档持续更新中...*
