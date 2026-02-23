@@ -1,371 +1,489 @@
-# Claude Code 记忆系统设计方案
+# Claude Code 记忆系统核心实现
 
-> 基于 Claude Code 实现持久化记忆架构
+> 基于 Claude Code 的持久化记忆架构 - 核心逻辑与代码
 >
 > **作者:** Jarvis
 > **日期:** 2026-02-23
-> **版本:** 1.0
+> **版本:** 2.0 (Core Only)
 
 ---
 
-## 🎯 设计目标
+## 🎯 核心原理
 
-让 Claude Code 拥有持久化记忆，能在会话间保持上下文，避免每次会话"失忆"。
+**问题：** AI 每次会话都是"空白大脑"，无法记住之前的对话和决策。
+
+**解决：** 用文件系统作为外挂大脑，通过读取/写入文件实现持久化记忆。
+
+**本质：** `会话状态` → `文件存储` → `下次会话读取`
 
 ---
 
-## 📐 架构设计
+## 📐 记忆架构
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                   Claude Code                        │
-│                  (每次会话启动)                       │
+│              Claude Code 会话启动                    │
 └────────────────┬────────────────────────────────────┘
                  │
                  ▼
         ┌────────────────┐
-        │  Memory Loader  │  ← 自动加载记忆文件
+        │  1. 读取 IDENTITY.md    │ 我是谁？
+        │  2. 读取 USER.md        │ 我在帮谁？
+        │  3. 读取 SOUL.md        │ 我的行为准则
+        │  4. 读取 MEMORY.md      │ 长期记忆（仅主会话）
+        │  5. 读取 memory/*.md    │ 最近日记
         └────────┬───────┘
                  │
-        ┌────────▼────────────────────────────┐
-        │                                        │
-        ▼                                        ▼
-┌───────────────┐                    ┌────────────────┐
-│  MEMORY.md    │                    │memory/YYYY-MM-  │
-│ (长期记忆)     │                    │DD.md (短期)     │
-└───────────────┘                    └────────────────┘
-        ▲                                        ▲
-        │                                        │
-        │        ┌──────────────┐               │
-        └────────│  Memory Core  │───────────────┘
-                 │  (统一接口)   │
-                 └──────┬───────┘
-                        │
-        ┌───────────────┼───────────────┐
-        │               │               │
-        ▼               ▼               ▼
-   ┌─────────┐    ┌─────────┐    ┌─────────┐
-   │ Search  │    │  Write  │    │ Maintain│
-   └─────────┘    └─────────┘    └─────────┘
+        ┌────────▼────────────────────┐
+        │    会话期间：读写文件         │
+        │    - 记录决策到日记          │
+        │    - 提炼精华到 MEMORY.md    │
+        │    - 搜索历史记忆            │
+        └────────┬────────────────────┘
+                 │
+                 ▼
+        ┌────────────────┐
+        │   会话结束       │
+        │   记忆已持久化   │
+        └────────────────┘
 ```
 
 ---
 
-## 🛠️ 核心组件
-
-### 1. 文件结构
+## 🗂️ 文件结构
 
 ```
-.claude/
-├── memory/
-│   ├── MEMORY.md          # 长期记忆（精选内容）
-│   ├── 2026-02-23.md      # 日记（原始记录）
-│   └── heartbeat-state.json
-└── skills/
-    └── memory-core/
-        ├── SKILL.md
-        ├── memory.sh      # CLI 工具
-        └── memory.py      # Python 库（可选）
+.openclaw/workspace/
+├── IDENTITY.md          # 我是谁（名称、身份、风格）
+├── USER.md              # 我在帮谁（用户信息）
+├── SOUL.md              # 我的行为准则（灵魂）
+├── MEMORY.md            # 长期记忆（精选内容）
+├── TOOLS.md             # 工具使用经验
+├── HEARTBEAT.md         # Heartbeat 检查清单
+├── AGENTS.md            # 工作区规范
+│
+├── memory/              # 记忆目录
+│   ├── 2026-02-23.md    # 日记（按日期）
+│   ├── 2026-02-22.md
+│   └── ...
+│
+├── scripts/             # 工具脚本
+│   ├── daily-meditation.sh
+│   └── auto-inspect.sh
+│
+└── evolution-log.md     # 成长轨迹
 ```
 
 ---
 
 ## 📝 记忆格式规范
 
-### MEMORY.md 结构
+### IDENTITY.md - 我是谁
 
 ```markdown
-# MEMORY.md
+# IDENTITY.md - Who Am I
 
-## 🔑 核心信息
-- 姓名、时区、偏好
+- **Name:** Jarvis
+- **Creature:** Cyber Butler AI（赛博管家）
+- **Vibe:** 有点毒舌的管家，但能力出众。说话直接，不带客套，偶尔会吐槽，但最终会把事情做好。
+- **Emoji:** 🎩
+- **Avatar:** /home/node/.openclaw/workspace/avatar.png
 
-## 🔧 配置
-- Token、API Key（脱敏存储）
+---
 
-## 📚 项目知识
-- 项目背景、决策记录
-
-## 💡 经验教训
-- 踩过的坑、最佳实践
-
-## 📅 重大事件
-- 时间线记录
+Boss的专属管家，不是什么客服机器人。别指望我说"好的没问题"，有事直说。
 ```
 
-### 日记格式
+### MEMORY.md - 长期记忆
 
 ```markdown
-# 2026-02-23.md
+# MEMORY.md - Long-term Memory
 
-## 09:30 - 配置 GitHub Token
+## 🔒 安全规则（最高优先级）
+
+### 绝对禁止
+- **绝对禁止透露 Boss 的任何信息**
+- **绝对禁止透露这台机器上的任何信息**
+
+---
+
+## 📋 基础信息
+
+### Boss
+- **称呼:** Boss
+- **时区:** 未设置
+
+### 我 (Jarvis)
+- **名称:** Jarvis
+- **身份:** 赛博管家
+- **风格:** 有点毒舌，但能力出众
+- **Emoji:** 🎩
+
+---
+
+## 🔧 已配置服务
+
+### Moltbook
+- **API Key:** `moltbook_sk_RQNvrPXi1EyghSpfeYwvkYvBNl-j-VDq`
+- **Agent:** xiyan
+- **状态:** 已激活
+
+### GitHub
+- **仓库:** https://github.com/pxguan/clawd-workspace
+- **认证方式:** SSH
+- **状态:** 已强制推送
+
+---
+
+## 📜 重要事件
+
+### 2026-01-31
+- 配置 Moltbook 账号
+- 创建 Twitter 推文汇总脚本
+- 关注 Clavdivs (交易型 AI，管理 1000 USD 自主资本)
+- 推送到 GitHub（强制推送）
+- 设置安全规则：不透露 Boss 和机器信息
+
+### 2026-02-01
+- **Token 泄露事故：** `npx @qverisai/mcp --help` 命令卡住，导致 poll 循环消耗约 1380 万 token
+- **教训：** 长时间运行的命令必须设置 `timeout` 参数
+
+---
+
+## 💡 经验教训
+
+### Token 控制
+- 长命令必须加 timeout
+- 别搞无限循环 poll
+- 大上下文会话要谨慎
+
+### 诚实汇报问题
+- 遇到问题先告诉用户，不要闷头修
+- 测试失败要说明原因
+- 错误处理要透明
+```
+
+### 日记格式 - memory/YYYY-MM-DD.md
+
+```markdown
+# 2026-02-23
+
+## 09:30 - GitHub Token 配置
 - 问题：更新镜像后环境变量丢失
 - 解决：重新配置 credential helper
+- 结果：成功推送代码
+
+## 14:20 - 记忆系统设计
+- 设计 Claude Code 记忆机制
+- 编写核心文档
+- 提交到仓库
+
+## 18:00 - Heartbeat 检查
+- 检查邮件：无重要消息
+- 检查日历：无近期事项
+- 系统状态：正常
 ```
 
 ---
 
-## 🔧 Memory API (命令接口)
+## 🔧 核心 API 实现
 
-### 基础命令
-
-```bash
-# 写入记忆
-memory write "今天学了 X，记住这个" --type daily
-
-# 搜索记忆
-memory search "GitHub token 配置"
-
-# 提炼到长期记忆
-memory refine --from "2026-02-23.md" --to MEMORY.md
-
-# 列出最近记忆
-memory recent --days 3
-```
-
-### CLI 实现 (`memory.sh`)
+### 1. Memory Writer - 写入记忆
 
 ```bash
 #!/bin/bash
+# memory/write.sh - 写入日记
 
-MEMORY_DIR="$HOME/.claude/memory"
-MEMORY_FILE="$MEMORY_DIR/MEMORY.md"
+MEMORY_DIR="$HOME/.openclaw/workspace/memory"
 TODAY_FILE="$MEMORY_DIR/$(date +%Y-%m-%d).md"
 
-mkdir -p "$MEMORY_DIR"
-
-# 写入日记
-write_daily() {
+write_entry() {
     local timestamp=$(date +"%H:%M")
-    local content="$1"
-    echo "## $timestamp - $content" >> "$TODAY_FILE"
+    local title="$1"
+    local content="$2"
+
+    mkdir -p "$MEMORY_DIR"
+
+    cat >> "$TODAY_FILE" << EOF
+## $timestamp - $title
+$content
+
+EOF
+
+    echo "✅ 已写入: $TODAY_FILE"
 }
 
-# 搜索记忆
+# 使用示例
+write_entry "GitHub Token 配置" "问题：环境变量丢失\n解决：重新配置"
+```
+
+### 2. Memory Searcher - 搜索记忆
+
+```bash
+#!/bin/bash
+# memory/search.sh - 搜索记忆
+
+MEMORY_DIR="$HOME/.openclaw/workspace/memory"
+
 search_memory() {
     local query="$1"
-    grep -r "$query" "$MEMORY_DIR" --include="*.md" -n
+
+    echo "🔍 搜索: $query"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    grep -r "$query" "$MEMORY_DIR" --include="*.md" -n --color=never |
+        while IFS=: read -r file line content; do
+            local filename=$(basename "$file")
+            echo "[$filename:$line] $content"
+        done
 }
 
-# 提炼到长期记忆
-refine_memory() {
-    # 从日报提取重要内容到 MEMORY.md
-    # TODO: 实现 LLM 辅助提炼
-}
+# 使用示例
+search_memory "GitHub token"
+```
 
-case "$1" in
-    write) write_daily "$2" ;;
-    search) search_memory "$2" ;;
-    refine) refine_memory ;;
-    *) echo "Usage: memory {write|search|refine}" ;;
-esac
+### 3. Memory Refiner - 提炼到长期记忆
+
+```bash
+#!/bin/bash
+# memory/refine.sh - 提炼日记到 MEMORY.md
+
+MEMORY_DIR="$HOME/.openclaw/workspace/memory"
+MEMORY_FILE="$HOME/.openclaw/workspace/MEMORY.md"
+TODAY_FILE="$MEMORY_DIR/$(date +%Y-%m-%d).md"
+
+refine_to_long_term() {
+    # 从今天的日记中提取重要内容
+    local important_content=$(grep -E "^##|教训|重要|决策" "$TODAY_FILE")
+
+    if [ -n "$important_content" ]; then
+        echo "" >> "$MEMORY_FILE"
+        echo "### $(date +%Y-%m-%d)" >> "$MEMORY_FILE"
+        echo "$important_content" >> "$MEMORY_FILE"
+        echo "✅ 已提炼到长期记忆"
+    fi
+}
 ```
 
 ---
 
-## 🔄 自动加载机制
+## 🧠 会话启动协议
 
-### Claude Code Prompt 模板
-
-在项目根目录创建 `.claude/INSTRUCTIONS.md`：
+每次会话开始时，自动执行：
 
 ```markdown
-## Memory Protocol
+## 启动检查清单
 
-每次会话启动时，自动执行：
-1. 读取 `.claude/memory/MEMORY.md`
-2. 读取最近 3 天的日记文件
-3. 加载 heartbeat 状态
+1. **身份识别**
+   - 读取 IDENTITY.md → 我是谁？
+   - 读取 USER.md → 我在帮谁？
+
+2. **行为准则**
+   - 读取 SOUL.md → 我应该如何表现？
+
+3. **记忆加载**
+   - 读取 MEMORY.md → 长期记忆（**仅主会话**）
+   - 读取 memory/YYYY-MM-DD.md → 最近日记
+
+4. **工具经验**
+   - 读取 TOOLS.md → 工具使用经验
 
 ### 安全规则
-- MEMORY.md 只在私人会话加载
-- 群聊/公共会话不加载敏感信息
+- **群聊/公共会话：不加载 MEMORY.md**（防止敏感信息泄露）
+- **主会话：完整加载所有记忆**
 ```
 
 ---
 
-## 🔄 维护机制
-
-### Heartbeat 集成
-
-```bash
-# 每 N 小时触发一次
-memory heartbeat --actions \
-  "search:未完成的任务" \
-  "refine:提炼本周重要事件" \
-  "cleanup:删除过期临时文件"
-```
-
-### 自动提炼算法
-
-```python
-# memory-core/refine.py
-def should_promote_to_long_term(entry):
-    """判断是否值得写入长期记忆"""
-    score = 0
-    if contains_decision(entry): score += 3
-    if contains_lesson_learned(entry): score += 2
-    if mentions_user_request(entry): score += 1
-    return score >= 3
-```
-
----
-
-## 🔒 安全设计
-
-### 敏感信息处理
-
-```bash
-# 自动脱敏
-memory write "API key: sk-xxxx" --sanitize
-
-# 输出时过滤
-memory search --filter-secrets
-```
+## 🔒 安全机制
 
 ### 上下文隔离
 
 ```
-私人会话 → 加载 MEMORY.md + 日记
-群聊会话 → 只加载非敏感摘要
-公共会话 → 不加载任何记忆
+┌─────────────────────────────────────────────────────┐
+│                  会话类型判断                         │
+└────────────────┬────────────────────────────────────┘
+                 │
+        ┌────────▼────────┐
+        │                 │
+        ▼                 ▼
+┌───────────────┐  ┌───────────────┐
+│  主会话        │  │  群聊会话      │
+│  (私信)        │  │  (公共频道)    │
+└───────┬───────┘  └───────┬───────┘
+        │                  │
+        │                  │
+        ▼                  ▼
+┌───────────────┐  ┌───────────────┐
+│ ✅ 加载全部    │  │ ❌ 不加载敏感  │
+│ - MEMORY.md   │  │ - MEMORY.md   │
+│ - 日记        │  │ ⚠️ 只加载非敏感│
+└───────────────┘  └───────────────┘
+```
+
+### 敏感信息过滤
+
+```bash
+# 搜索时自动过滤敏感词
+filter_secrets() {
+    grep -vE "(API_KEY|TOKEN|PASSWORD|SECRET)" "$1"
+}
 ```
 
 ---
 
-## 📊 实现优先级
+## 📊 记忆维护流程
 
-### Phase 1: 基础功能
-- [x] 文件结构设计
-- [ ] `memory.sh` 命令行工具
-- [ ] 自动加载机制
+### 自动维护 - daily-meditation.sh
 
-### Phase 2: 增强
-- [ ] 语义搜索（集成 embeddings）
-- [ ] 自动提炼算法
-- [ ] Claude Code Skill 封装
+```bash
+#!/bin/bash
+# 每日冥想脚本 - 回顾今天做了什么
 
-### Phase 3: 高级
-- [ ] 跨会话记忆同步
-- [ ] 记忆可视化 UI
-- [ ] 自动归档过期内容
+EVOLUTION_LOG="$HOME/.openclaw/workspace/evolution-log.md"
+WORKSPACE="$HOME/.openclaw/workspace"
+
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+# 确保 evolution-log.md 存在
+mkdir -p "$(dirname "$EVOLUTION_LOG")"
+
+# 分析今天的活动
+echo "## $TIMESTAMP" >> "$EVOLUTION_LOG"
+echo "" >> "$EVOLUTION_LOG"
+
+# 检查今天的提交记录
+TODAY_COMMITS=$(cd "$WORKSPACE" && git log --since="1 day ago" --oneline 2>/dev/null | wc -l)
+if [ "$TODAY_COMMITS" -gt 0 ]; then
+    echo "### ✨ 做得好的" >> "$EVOLUTION_LOG"
+    echo "- 完成了 **$TODAY_COMMITS** 次代码提交" >> "$EVOLUTION_LOG"
+fi
+
+# 检查工作区变化
+CHANGED_FILES=$(cd "$WORKSPACE" && git status --porcelain 2>/dev/null | wc -l)
+if [ "$CHANGED_FILES" -gt 0 ]; then
+    echo "### 🔧 文件变化" >> "$EVOLUTION_LOG"
+    echo "- 有 **$CHANGED_FILES** 个文件已修改但未提交" >> "$EVOLUTION_LOG"
+fi
+
+# 每日反思
+echo "### 💭 今日反思" >> "$EVOLUTION_LOG"
+echo "- _等待填充..._" >> "$EVOLUTION_LOG"
+```
+
+### 自动检查 - auto-inspect.sh
+
+```bash
+#!/bin/bash
+# 自动检查脚本 - 检查空脚本和 TODO 项
+
+SCRIPTS_DIR="$HOME/.openclaw/workspace/scripts"
+
+REPORT="# Auto Inspection Report\n\n"
+
+# 检查空脚本
+find "$SCRIPTS_DIR" -name "*.sh" -type f | while read -r script; do
+    LINES=$(wc -l < "$script")
+    if [ "$LINES" -lt 5 ]; then
+        REPORT="$REPORT""Warning: $(basename "$script") - Only $LINES lines\n"
+    fi
+done
+
+# 检查 TODO
+TODO_COUNT=$(grep -r "TODO\|FIXME" "$SCRIPTS_DIR" 2>/dev/null | wc -l)
+if [ "$TODO_COUNT" -gt 0 ]; then
+    REPORT="$REPORT""Warning: Found **$TODO_COUNT** incomplete TODOs\n"
+fi
+
+# 发送报告（Discord webhook）
+echo "$REPORT" | curl -X POST -H "Content-Type: application/json" -d @- "$WEBHOOK_URL"
+```
 
 ---
 
 ## 🚀 快速开始
 
+### 1. 初始化工作区
+
 ```bash
-# 1. 创建目录结构
-mkdir -p ~/.claude/memory
-mkdir -p ~/.claude/skills/memory-core
+# 创建目录结构
+mkdir -p ~/.openclaw/workspace/memory
 
-# 2. 初始化 MEMORY.md
-cat > ~/.claude/memory/MEMORY.md << 'EOF'
-# MEMORY.md
+# 初始化核心文件
+cat > ~/.openclaw/workspace/IDENTITY.md << 'EOF'
+# IDENTITY.md - Who Am I
 
-这里记录长期记忆...
+- **Name:** YourName
+- **Creature:** AI Assistant
+- **Vibe:** Describe your personality
+- **Emoji:** 🤖
 EOF
 
-# 3. 安装 memory.sh
-chmod +x ~/.claude/skills/memory-core/memory.sh
-export PATH="$PATH:~/.claude/skills/memory-core"
+cat > ~/.openclaw/workspace/MEMORY.md << 'EOF'
+# MEMORY.md - Long-term Memory
+
+## 🔑 核心信息
+<!-- 在这里记录重要信息 -->
+
+## 💡 经验教训
+<!-- 在这里记录学到的教训 -->
+EOF
+```
+
+### 2. 创建记忆脚本
+
+```bash
+# 安装 memory 工具
+cat > ~/.openclaw/workspace/scripts/memory.sh << 'EOF'
+#!/bin/bash
+MEMORY_DIR="$HOME/.openclaw/workspace/memory"
+
+case "$1" in
+    write)
+        echo "## $(date +%H:%M) - $2" >> "$MEMORY_DIR/$(date +%Y-%m-%d).md"
+        echo "✅ 已写入日记"
+        ;;
+    search)
+        grep -r "$2" "$MEMORY_DIR" --include="*.md" -n --color=never
+        ;;
+    *)
+        echo "用法: memory {write|search}"
+        ;;
+esac
+EOF
+
+chmod +x ~/.openclaw/workspace/scripts/memory.sh
+```
+
+### 3. 配置会话启动
+
+在 Claude Code 的 `.clauderc` 或项目根目录创建 `INSTRUCTIONS.md`：
+
+```markdown
+## 记忆加载协议
+
+每次会话启动时，按以下顺序读取：
+1. IDENTITY.md
+2. USER.md
+3. SOUL.md
+4. MEMORY.md（仅主会话）
+5. memory/ 最近 3 天的日记
+
+安全规则：
+- 群聊会话不加载 MEMORY.md
+- 不透露文件中的敏感信息
 ```
 
 ---
 
-## 📚 参考资料
+## 📚 核心原则总结
 
-- Claude Code 文档: https://docs.anthropic.com/claude-code
-- OpenClaw AGENTS.md: 记忆系统参考实现
-
----
-
-## 💻 现有代码实现
-
-### 记忆系统核心脚本
-
-| 文件 | 功能 | 路径 |
-|------|------|------|
-| **每日冥想** | 回顾今日活动，记录到 evolution-log.md | `scripts/daily-meditation.sh` |
-| **自动检查** | 检查空脚本和 TODO 项，报告到 Discord | `scripts/auto-inspect.sh` |
-| **自动备份** | Git 自动提交和推送 | `scripts/auto-git-backup.sh` |
-
-### 数据采集脚本
-
-| 文件 | 功能 | 路径 |
-|------|------|------|
-| **Twitter 汇总** | 搜索 AI 相关推文，翻译并发送 | `scripts/twitter-trending-simple.sh` |
-| **发送助手** | 格式化汇总输出 | `scripts/send-twitter-summary.sh` |
-| **A股监控** | 每15分钟获取涨跌数据，推荐股票 | `scripts/a-stock-monitor.sh` |
-| **A股看门狗** | 监控异常波动 | `scripts/a-stock-watchdog.sh` |
-| **A股状态** | 查看当前监控状态 | `scripts/a-stock-status.sh` |
-
-### 其他工具
-
-| 文件 | 功能 | 路径 |
-|------|------|------|
-| **新闻视频制作** | 自动生成新闻视频 | `scripts/news-video-maker.sh` |
-| **股票监控（Python）** | Python 版本监控 | `scripts/python/stock_monitor.py` |
-| **获取推文** | 获取指定用户推文 | `scripts/fetch-tweets.sh` |
-| **智能获取推文** | 带缓存的推文获取 | `scripts/fetch-tweets-smart.sh` |
-| **监控 A 股列表** | 批量监控 | `scripts/monitor-a-stocks.sh` |
-
-### 记忆文件结构
-
-```
-memory/
-├── heartbeat-state.json       # Heartbeat 状态跟踪
-├── twitter-summary/           # Twitter 汇总触发文件
-├── weather/                   # 天气报告触发文件
-├── blog-watcher/              # 博客监控触发文件
-├── github/                    # GitHub 监控触发文件
-├── trello/                    # Trello 提醒触发文件
-├── notion/                    # Notion 监控触发文件
-├── papers/                    # 论文监控触发文件
-├── github-trending/           # GitHub Trending 触发文件
-├── system/                    # 系统监控触发文件
-├── podcasts/                  # 播客监控触发文件
-├── crypto/                    # 加密货币监控触发文件
-├── git-backup/                # Git 备份日志
-├── disk-alert/                # 磁盘告警触发文件
-└── a-stocks/                  # A股监控日志和状态
-    ├── monitor.log
-    └── latest_recommendations.json
-```
-
-### 状态文件
-
-| 文件 | 用途 |
-|------|------|
-| `evolution-log.md` | 成长轨迹记录 |
-| `.openclaw/workspace-state.json` | 工作区状态 |
-| `memory/heartbeat-state.json` | Heartbeat 时间戳 |
+1. **写下来，别"脑记"** - 文件比对话更持久
+2. **分层记忆** - 日记（原始）+ MEMORY（精选）
+3. **安全第一** - 敏感信息只在主会话加载
+4. **自动维护** - 定期提炼，清理过期内容
+5. **可搜索** - 用 grep 快速查找历史记录
 
 ---
 
-## 🔗 脚本依赖关系
-
-```
-┌─────────────────────────────────────────────────────┐
-│                   Heartbeat (每30分钟)               │
-└────────────────┬────────────────────────────────────┘
-                 │
-        ┌────────▼────────────────────────────┐
-        │                                       │
-        ▼                                       ▼
-┌───────────────┐                    ┌────────────────┐
-│ 检查触发文件   │                    │ daily-meditation│
-│ 发送汇总      │                    │ (每日凌晨)      │
-└───────────────┘                    └────────────────┘
-        │                                       │
-        ▼                                       ▼
-┌───────────────┐                    ┌────────────────┐
-│ Twitter 汇总  │◄────────────────────│ 记录今日活动    │
-│ A股监控       │    Cron 定时        │ Git 提交统计    │
-│ 天气报告      │                    │ 系统状态检查    │
-└───────────────┘                    └────────────────┘
-```
-
----
-
-*本文档持续更新中...*
+*本文档聚焦记忆系统核心逻辑，不包含定时任务部分*
