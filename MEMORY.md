@@ -88,6 +88,7 @@
 ## 🛠️ 脚本路径（已更新）
 
 ### 当前有效脚本
+- `/home/node/.openclaw/workspace/scripts/auto-git-backup.sh` - Git 自动备份 ✅
 - `/home/node/.openclaw/workspace/scripts/twitter-trending-simple.sh` - Twitter 汇总（需要修复 webhook）
 - `/home/node/.openclaw/workspace/scripts/auto-inspect.sh` - 自动巡查 ✅
 - `/home/node/.openclaw/workspace/scripts/daily-meditation.sh` - 每日冥想 ✅
@@ -105,9 +106,7 @@
 - `arxiv-paper-tracker.py` - AI 论文追踪
 - `system-monitor.sh` - 系统监控
 - `podcast-monitor.sh` - 播客监控
-- `git-backup.sh` - Git 备份
 - `ai-news-daily.sh` - AI 资讯推送
-- `discord-webhook.sh` - Discord webhook（Twitter 脚本依赖）
 
 ---
 
