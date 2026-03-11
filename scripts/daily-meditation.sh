@@ -1,9 +1,8 @@
 #!/bin/bash
-# 每日冥想脚本 - 回顾今天做了什么
-# 每天凌晨 2:30 运行
+# 每日冥想脚本 - 修正路径
 
-EVOLUTION_LOG="$HOME/.openclaw/workspace/evolution-log.md"
-WORKSPACE="$HOME/.openclaw/workspace"
+EVOLUTION_LOG="/home/node/.openclaw/workspace/evolution-log.md"
+WORKSPACE="/home/node/.openclaw/workspace"
 
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 BEIJING_TIME=$(date -d '+8 hour' '+%Y-%m-%d %H:%M:%S')
@@ -34,17 +33,6 @@ if [ "$TODAY_COMMITS" -gt 0 ]; then
     done
     echo "" >> "$EVOLUTION_LOG"
 fi
-
-# 检查定时任务状态（通过 curl）
-echo "### ⚙️ 系统状态" >> "$EVOLUTION_LOG"
-CRON_CHECK=$(curl -s "http://localhost:3333/api/cron/list" 2>/dev/null)
-if [ -n "$CRON_CHECK" ]; then
-    CRON_STATUS=$(echo "$CRON_CHECK" | grep -o '"enabled":true' | wc -l)
-    echo "- 活跃定时任务: **$CRON_STATUS** 个" >> "$EVOLUTION_LOG"
-else
-    echo "- 定时任务状态: 无法获取" >> "$EVOLUTION_LOG"
-fi
-echo "" >> "$EVOLUTION_LOG"
 
 # 检查工作区变化
 echo "### 🔧 文件变化" >> "$EVOLUTION_LOG"

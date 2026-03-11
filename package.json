@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "@brave/brave-search-mcp-server": "^2.0.72"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.3"
   }
 }

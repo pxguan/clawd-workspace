@@ -1,7 +1,7 @@
 #!/bin/bash
-# 自动 Git 备份脚本 - 每次更新内存文件时自动提交并推送
+# 自动 Git 备份脚本 - 修正路径
 
-WORKSPACE="/home/node/clawd"
+WORKSPACE="/home/node/.openclaw/workspace"
 cd "$WORKSPACE" || exit 1
 
 # 检查是否有变更
@@ -13,13 +13,13 @@ fi
 # 添加所有变更
 git add -A
 
-# 提交（自动生成提交信息）
+# 提交
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S UTC')
-COMMIT_MSG="Auto-commit: $TIMESTAMP"
+COMMIT_MSG="Auto-backup: $TIMESTAMP"
 
 git commit -m "$COMMIT_MSG"
 
-# 推送到远程（需要配置 GitHub 认证）
-git push origin main
+# 推送
+git push origin $(git branch --show-current) 2>&1
 
 echo "✅ 已备份到 GitHub: $TIMESTAMP"

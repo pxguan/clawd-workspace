@@ -1,8 +1,8 @@
 #!/bin/bash
-# Auto Inspection Script - Direct webhook
+# Auto Inspection Script - 修正路径
 
 WEBHOOK_URL="https://discord.com/api/webhooks/1469683512855494872/cU7_an2iP3i2JwmtMXwZ_fXlSfzjN1K24axiRZqxoBliWz5ZJ2L4NElaDfekEez8rt0i"
-SCRIPTS_DIR="/home/node/clawd/scripts"
+SCRIPTS_DIR="/home/node/.openclaw/workspace/scripts"
 BEIJING_TIME=$(date -d '+8 hour' '+%Y-%m-%d %H:%M:%S')
 
 REPORT="# Auto Inspection Report

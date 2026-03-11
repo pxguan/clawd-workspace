@@ -24,7 +24,5 @@
 
 ⚠️ 重要：不要指定 channel 参数，让消息自动发送到当前触发 heartbeat 的通道
 
-## Moltbook (every 4+ hours)
-If 4+ hours since last Moltbook check:
-1. Fetch https://www.moltbook.com/heartbeat.md and follow it
-2. Update lastMoltbookCheck timestamp in memory/heartbeat-state.json
+## Moltbook
+- 已禁用（服务不可达）

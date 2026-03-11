@@ -1,0 +1,62 @@
+# Twitter 技术领域博主列表
+# 格式：@username | 粉丝数(万) | 领域 | 说明
+# 注意：bird CLI 抓不到粉丝数，需要手动维护
+
+# === AI 研究者/CEO ===
+@AndrewYNg | 200+ | AI | 吴恩达，AI 教育者
+@ylecun | 100+ | AI | Yann LeCun，Meta AI 首席科学家
+@fchollet | 50+ | AI | François Chollet，Keras 作者
+@goodfellow_ian | 20+ | AI | Ian Goodfellow，GAN 发明者
+@jeremyphoward | 30+ | AI | Jeremy Howard，fast.ai 创始人
+@hardmaru | 20+ | AI | David Ha，Google Brain
+@karpathy | 100+ | AI | Andrej Karpathy，OpenAI 前研究科学家
+@sama | 50+ | AI | Sam Altman，OpenAI CEO
+@drfeifei | 10+ | AI | 李飞飞，斯坦福教授
+
+# === Anthropic/Claude ===
+@AnthropicAI | 官方 | Claude | Anthropic 官方账号
+@ClaudeAI | 官方 | Claude | Claude 产品账号
+@dario_amodei | 5+ | AI | Dario Amodei，Anthropic CEO
+@DanielaAmodei | 5+ | AI | Daniela Amodei，Anthropic 总统
+
+# === OpenAI ===
+@OpenAI | 官方 | AI | OpenAI 官方
+@ChatGPT | 官方 | AI | ChatGPT 产品
+@gdb | 20+ | AI | Greg Brockman，OpenAI 总裁
+
+# === Google DeepMind ===
+@GoogleDeepMind | 官方 | AI | Google DeepMind 官方
+@GoogleAI | 官方 | AI | Google AI 官方
+@demishassistent | 50+ | AI | Demis Hassabis，DeepMind CEO
+
+# === Meta AI ===
+@MetaAI | 官方 | AI | Meta AI 官方
+@ympasql | 10+ | AI | Yann LeCun 个人账号(备份)
+
+# === Mistral AI ===
+@MistralAI | 官方 | AI | Mistral AI 官方
+@arthurmensch | 10+ | AI | Arthur Mensch，Mistral CEO
+
+# === Hugging Face ===
+@HuggingFace | 官方 | AI | Hugging Face 官方
+@wolfram | 30+ | AI | Thomas Wolf，Hugging Face 联合创始人
+
+# === AI 开发者/博主 ===
+@nickchoat | 5+ | AI | Nick Choat，AI 博主
+@latentviews | 5+ | AI | AI 分析博主
+@frostalien | 10+ | AI | AI 工具博主
+@borispower | 5+ | AI | AI 博主
+
+# === 开源/技术 ===
+@nixcraft | 50+ | Linux | Linux 技术博主
+@ThePracticalDev | 100+ | Dev | Dev.to 官方
+@github | 200+ | Dev | GitHub 官方
+
+# === Web3/区块链 (可选) ===
+@VitalikButerin | 500+ | Web3 | Vitalik Buterin，以太坊创始人
+@balajis | 200+ | Tech | Balaji Srinivasan，前 Coinbase CTO
+
+# === 科技新闻 ===
+@TechCrunch | 200+ | Tech | 科技媒体
+@verge | 200+ | Tech | 科技媒体
+@wired | 200+ | Tech | 科技媒体

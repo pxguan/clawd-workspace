@@ -1,5 +1,11 @@
 # TIPS.md - 实用经验记录
 
+## 网页内容提取
+- **defuddle.md** - 网页清洗服务，Obsidian CEO kepano 出品
+  - 用法：`https://defuddle.md/<URL>`
+  - 作为 Jina Reader 的替代方案
+  - 同样无法访问微信公众号文章
+
 ## Feishu 发送图片
 - ❌ 不要用 `read` 返回的 base64（Feishu 不支持显示）
 - ✅ 使用 `message` 工具：
@@ -25,4 +31,4 @@
 - 需要额外下载图片，不是 base64 直接返回
 
 ---
-*最后更新: 2026-02-03*
+*最后更新: 2026-03-10*
